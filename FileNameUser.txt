@@ -1,0 +1,14 @@
+fatima,1999,falafel,4444
+Tabitha,1237,witch,6666
+Claudia Hufferton,1110,bakedBread,1010
+Randy McDooDoo,1968,horsesRcool,8888
+Gorgon Zola,1757,cheeseman,5550
+Rafferty Mafferty,1598,pokerplayer,2222
+Solar System,1000,mrbigbang,9999
+Comme Puter,1943,datamachiner,7777
+Mr. Uncle Bob,1555,unclebobby,7777
+Patricia Longwood,1555,falafelAdmin,1111
+julia,2000,julia,1234
+Cristiano,1985,cr7,7777
+real,0,madrid,9802
+Hani,1991,HAKRI,1234

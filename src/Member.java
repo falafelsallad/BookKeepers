@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Member extends Person {
-    private String memberID;
     private int numberOfLoans = 0;
     private List<Book> favoriteBooks = new ArrayList<>(); //List for favorite books.
 
     public Member(String name, int yearOfBirth, String userName, int password) {
         super(name, yearOfBirth, userName, password);
         this.numberOfLoans = 0;
-        this.memberID = userName;
     }
 
     public void addFavoriteBookFromLog(String ISBN, String filePath) {

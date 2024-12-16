@@ -1,8 +1,8 @@
 public class Person {
-    private String name;
-    private int yearOfBirth;
-    private String userName;
-    private int password;
+    private final String name;
+    private final int yearOfBirth;
+    private final String userName;
+    private final int password;
 
     public Person(String name, int yearOfBirth, String userName, int password) {
         this.name = name;

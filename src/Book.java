@@ -8,14 +8,14 @@ import java.util.Scanner;
 
 public class Book {
 
-    private String bookName;
-    private String author;
-    private String ISBN;
-    private String publisher;
-    private String genre;
-    private int publishYear;
+    private final String bookName;
+    private final String author;
+    private final String ISBN;
+    private final String publisher;
+    private final String genre;
+    private final int publishYear;
     private int quantity;
-    private static List <String> queue = new ArrayList<>();
+    private static final List <String> queue = new ArrayList<>();
 
     public Book(String bookName, String author, String ISBN, String publisher, String genre, int publishYear, int quantity) {
         this.bookName = bookName;

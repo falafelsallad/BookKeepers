@@ -163,4 +163,21 @@ public class LibrarySystem {
             }
         }
     }
+
+    public boolean getIsSomeoneLoggedIn() {
+        return UserLoginCommand.getLoggedIn() || AdminLoginCommand.getLoggedIn() ||
+                CreateAdminAccCommand.getLoggedIn()  || CreateUserAccCommand.getLoggedIn();
+    }
+
+    public String getWhosLoggedIn() {
+        String[] usernames = {UserLoginCommand.getLOGGEDIN_USERNAME(), AdminLoginCommand.getLOGGEDIN_USERNAME(),
+                CreateAdminAccCommand.getLOGGEDIN_USERNAME(), CreateUserAccCommand.getLOGGEDIN_USERNAME()};
+
+        for (String username : usernames) {
+            if (username != null) {
+                return username;
+            }
+        }
+        return null;
+    }
 }

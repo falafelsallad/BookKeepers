@@ -70,7 +70,7 @@ public class Book {
     public static void searchBooks(List<Book> bookList, String searchInput, String userName) {
         List<Book> searchResults = new ArrayList<>();
         String lowerSearchString = searchInput.toLowerCase();               //TODO: Check if the book exists before queue!
-        boolean queue = true;
+        boolean queue = false;
 
         for (Book book : bookList) {
             if (book.bookName.toLowerCase().contains(lowerSearchString) ||
@@ -82,16 +82,18 @@ public class Book {
                     String.valueOf(book.quantity).contains(lowerSearchString)) {
                 searchResults.add(book);
             }
-            if (book.quantity == 0) {
-                queue = false;
-                queueBook(book.bookName, userName, printInfo(searchResults.getFirst()));
 
+            if (!book.isAvailable() && searchResults.contains(book)) {
+                queue = true;
+                System.out.println("Books matching! \"" + searchInput + "\":");
+                System.out.println(printInfo(searchResults.getFirst()));
+                queueBook(book.bookName, userName);
             }
         }
         if (searchResults.isEmpty()) {
             System.out.println("No books found matching \"" + searchInput + "\".");
-        } else if (queue == true) {
-            System.out.println("Books matching \"" + searchInput + "\":");
+        } else if (!queue) {
+            System.out.println("Book matching \"" + searchInput + "\":");
             for (Book result : searchResults) {
                 System.out.println(printInfo(result));
             }
@@ -99,9 +101,7 @@ public class Book {
 
     }
 
-    public static void queueBook(String bookName, String userName, String searchResults) {
-        System.out.println("Books matching! \"" + bookName + "\":");
-        System.out.println(searchResults);
+    public static void queueBook(String bookName, String userName) {
         System.out.println("The book: " + bookName + " is not available.\nWould you like to stand in queue?");
         Scanner scan = new Scanner(System.in);
         String answer = scan.nextLine();

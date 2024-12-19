@@ -9,7 +9,7 @@ public class BorrowCommand implements Command {
     private Scanner scanner;
     private List<Book> bookList = Book.getBooks();
 
-    public BorrowCommand(UserHandler userHandler, Scanner scanner) {
+    public BorrowCommand(Scanner scanner) {
         this.userHandler = UserHandler.getInstance();
         this.scanner = scanner;
     }
@@ -19,7 +19,7 @@ public class BorrowCommand implements Command {
         System.out.println("Choose a book by entering its ISBN: \n (or enter 'search' to search for a book)");
         String userInput = scanner.nextLine().trim();
         if (userInput.equalsIgnoreCase("search")) {
-            new SearchCommand(userHandler, scanner).execute();
+            new SearchCommand(scanner).execute();
         } else if (userInput.trim().isEmpty() || !userInput.matches("[0-9]+") || userInput.length() != 13) {
             System.out.println("Invalid input, ISBN should be 13 digits long try again.");
             return;

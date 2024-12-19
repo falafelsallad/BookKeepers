@@ -3,77 +3,20 @@ package Librarysystems;
 import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Member extends Person {
-    private List<Book> favoriteBooks = new ArrayList<>(); //List for favorite books.
+    private Map<String, List<Book>> favourites = new HashMap<>();
+    private static List<Member> memberList = new ArrayList<>();
+
+    static {
+        memberList = getMembers();
+    }
 
     public Member(String name, int yearOfBirth, String userName, int password) {
         super(name, yearOfBirth, userName, password);
-    }
-
-    public void addFavoriteBookFromLog(String ISBN, String filePath) {
-        List<Book> bookList = Book.getBooks(); //get books from file
-        boolean bookFound = false;
-
-        System.out.println("Searching for ISBN: " + ISBN);
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2 && parts[0].equals(this.getUserName()) && parts[1].trim().equals(ISBN.trim())) {
-                    System.out.println("This book is already in your favorites.");
-                    return;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading favorites file: " + e.getMessage());
-        }
-
-        for (Book book : bookList) {
-            if (book.getISBN().trim().equals(ISBN.trim())) {
-                favoriteBooks.add(book);
-                try (FileWriter writer = new FileWriter(filePath, true)) {
-                    writer.write(this.getUserName() + "," + ISBN + "\n");
-                } catch (IOException e) {
-                    System.out.println("Error saving favorite: " + e.getMessage());
-                }
-
-                System.out.println("Book added to favorites: " + book.getTitle());
-                bookFound = true;
-                break;
-            }
-        }
-        if (!bookFound) {
-            System.out.println("No book found with ISBN: " + ISBN);
-        }
-
-    }
-
-    public void loadFavoritesFromFile(String filePath, List<Book> bookList) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2 && parts[0].equals(this.getUserName())) {
-                    String isbn = parts[1].trim();
-                    for (Book book : bookList) {
-                        if (book.getISBN().equals(isbn)) {
-                            if (!favoriteBooks.contains(book)) {
-                                favoriteBooks.add(book);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error loading favorites: " + e.getMessage());
-        }
-    }
-
-    public List<Book> getFavoriteBooks() {
-        return favoriteBooks;
     }
 
     public static List<Member> getMembers() {
@@ -115,4 +58,18 @@ public class Member extends Person {
         }
         return memberList;
     }
+
+    public static String memberListToString() {
+        StringBuilder sb = new StringBuilder();
+        for (Member member : memberList) {
+            sb.append(member.toString()).append("\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Name: " + getName() + ", Year of Birth: " + getYearOfBirth() + ", Username: " + getUserName();
+    }
+
 }

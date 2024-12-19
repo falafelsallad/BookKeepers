@@ -10,7 +10,7 @@ public class CreateUserAccCommand implements Command {
     private static String LOGGEDIN_USERNAME;
     private static boolean loggedIn;
 
-    public CreateUserAccCommand(UserHandler userHandler, Scanner scanner) {
+    public CreateUserAccCommand(Scanner scanner) {
         this.userHandler = UserHandler.getInstance();
         this.scanner = scanner;
     }

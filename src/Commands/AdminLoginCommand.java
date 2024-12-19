@@ -10,7 +10,7 @@ public class AdminLoginCommand implements Command {
     private static String LOGGEDIN_USERNAME;
     private static boolean loggedIn;
 
-    public AdminLoginCommand(UserHandler userHandler, Scanner scanner) {
+    public AdminLoginCommand(Scanner scanner) {
         this.userHandler = UserHandler.getInstance();
         this.scanner = scanner;
     }
@@ -18,7 +18,7 @@ public class AdminLoginCommand implements Command {
     public void execute() {
         System.out.println("Enter username: ");
         LOGGEDIN_USERNAME = scanner.nextLine().trim();
-        loggedIn = userHandler.login(LOGGEDIN_USERNAME, true, 3);
+        loggedIn = userHandler.login(LOGGEDIN_USERNAME, true, 0);
     }
 
     public static boolean getLoggedIn() {

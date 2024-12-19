@@ -20,11 +20,12 @@ public class LibraryInterface {
         String LibraryOpenHours = "Mon-Fri 08-17";
         String userNameLOGGEDIN = "Guest";
         String menuOptionsLogin = "\n1. Login\n2. Sign up\n3. Admin Login\n4. Create Admin Account\n5. Information";
+
         String menuOptions = "\n1. Search/Check quantity \n2. Borrow a book \n3. Return a book " +
                 "\n4. Book Tips \n5. Mark a favorite book\n6 Queue for a book \n7. Exit";
         List<Book> bookList = Book.getBooks();
         List<Loan> loanList = Loan.getLoanList();
-        Loan.readLoanFromFile(loanList);
+//        Loan.readLoanFromFile(loanList);
         List<Member> memberList = Member.getMembers();
 
         Scanner scanner = new Scanner(System.in);
@@ -104,7 +105,7 @@ public class LibraryInterface {
                     if (loanID.isEmpty()) {
                         System.out.println("You must enter a valid Loan ID.");
                     } else {
-                        String result = Loan.returnBook(loanID, loanList);
+                        String result = Loan.returnBook(loanID);
                         Loan.saveLoansToFile(loanList);
                         System.out.println(result);
                     }
@@ -121,7 +122,7 @@ public class LibraryInterface {
                     } else {
                         for (Member member : memberList) {
                             if (member.getUserName().trim().equals(userNameLOGGEDIN.trim())) {
-                                member.addFavoriteBookFromLog(favoriteISBN, "favorites.txt");//Puts books as favorites
+//                                member.addBookToFavourite(favoriteISBN, "favourites.txt");//Puts books as favorites
                                 break;
                             }
                         }
@@ -173,13 +174,13 @@ public class LibraryInterface {
                     break;
                 case 2:
                     //Check members
-                    System.out.println("Members List:\n" + memberList.toString());
+                    System.out.println("Members List:\n" + memberList);
                     break;
                 case 3:
                     //Delete Librarysystems.Member
                     System.out.println("Whats the username: ");
                     String temp = scanner.nextLine();
-                    userHandler.deleteUser(temp, memberList);
+                    userHandler.deleteMember(temp, memberList);
                     userHandler.updateUserFile(memberList);
                     break;
                 case 4:

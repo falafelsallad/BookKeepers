@@ -1,9 +1,6 @@
 package Librarysystems;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -22,22 +19,28 @@ public class Loan {
     private static List<Loan> loanList = new ArrayList<>();
     private static UserHandler userHandler;
 
+    static {
+        userHandler = UserHandler.getInstance();
+        loanList = readLoanFromFile(loanList);
+    }
+
     public Loan(String ISBN, LocalDate startDate, LocalDate endDate, String userName, String loanID) {
         this.ISBN = ISBN;
         this.startDate = startDate;
         this.endDate = endDate;
         this.userName = userName;
         this.loanID = generateLoanID(ISBN, userName);
-        this.userHandler = UserHandler.getInstance();
+        userHandler = UserHandler.getInstance();
     }
 
-    public static String returnBook(String loanID, List<Loan> loanList) {
+    public static String returnBook(String loanID) {
         if (loanID == null || loanID.isEmpty()) {
             return "Loan does not exist";
         }
         for (Loan loan : loanList) {
             if (loan.getLoanID().trim().equalsIgnoreCase(loanID.trim())) {
                 loanList.remove(loan);
+                saveLoansToFile(loanList);
                 for (Book book : Book.getBooks()) {
                     if (book.getISBN().equals(loan.getISBN())) {
                         book.setQuantity(book.getQuantity() + 1);
@@ -66,14 +69,13 @@ public class Loan {
     }
 
     public static void saveLoansToFile(List<Loan> loanList) {
-        try (BufferedWriter bufferedWriter = Files.newBufferedWriter(Paths.get("LoanLog.txt"),StandardOpenOption.APPEND, StandardOpenOption.CREATE)) {
+        try (FileWriter fileWriter = new FileWriter("LoanLog.txt", false)){
             for (Loan loan : loanList) {
-                bufferedWriter.write(loan.toString() + "\n");
+                fileWriter.write(loan.toString() + "\n");
             }
-            bufferedWriter.flush();
+            System.out.println("Loan list updated successfully.");
         } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            System.out.println("An error occurred while clearing the file: " + e.getMessage());        }
     }
 
     public static void applyForLoan(String userName, String ISBN, List<Book> bookList) {
@@ -126,11 +128,27 @@ public class Loan {
         } catch (IOException e) {
             System.out.println("There is no borrowed book in the list yet.");
         }
-        return loanList;
+        return Loan.loanList;
     }
 
     public static List<Loan> getLoanList() {
-        return loanList;
+        return Loan.loanList;
+    }
+
+    public static String loanListToString() {
+        StringBuilder sb = new StringBuilder();
+        for (Loan loan : loanList) {
+            sb.append(loan.toString()).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public static void getUserLoans(String userName) {
+        for (Loan loan : loanList) {
+            if (loan.userName.equalsIgnoreCase(userName)) {
+                System.out.println(loan);
+            }
+        }
     }
 
     public static LocalDate calculateDueDate(LocalDate localDate) {
@@ -138,12 +156,12 @@ public class Loan {
     }
 
     public static String generateLoanID(String ISBN, String username) {
-        return ISBN + username + LocalDate.now();
+        return ISBN + username.trim() + LocalDate.now();
     }
 
     @Override
     public String toString() {
-        return ISBN + "\n" + userName + "\n" + startDate + "\n" + endDate + "\n" + loanID;
+        return ISBN + "\n" + userName + "\n" + startDate + "\n" + endDate + "\n" + loanID + "\n";
     }
 
     public String getLoanID() {

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Admin extends Person {
-    Scanner scan = new Scanner(System.in);
+
 
     public Admin(String name, int yearOfBirth, String userName, int password) {
         super(name, yearOfBirth, userName, password);

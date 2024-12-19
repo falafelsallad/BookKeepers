@@ -16,8 +16,7 @@ public class Book {
     private final String genre;
     private final int publishYear;
     private int quantity;
-    private Queue<String> queue = new LinkedList<>();
-    private static final List <String> queuetsdf = new ArrayList<>();
+    private final Queue<String> queue = new LinkedList<>();
 
     public Book(String bookName, String author, String ISBN, String publisher, String genre, int publishYear, int quantity) {
         this.bookName = bookName;
@@ -73,7 +72,7 @@ public class Book {
                 //Stores Personal-number
                 readInBookName = line;
                 readInAuthor = br.readLine();
-                readInISBN = br.readLine();
+                readInISBN = br.readLine().trim();
                 readInPublisher = br.readLine();
                 readInGenre = br.readLine();
                 readInYear = br.readLine();
@@ -142,20 +141,6 @@ public class Book {
             }
         }
 
-    }
-
-    public static void queueBook(String bookName, String userName) {
-        System.out.println("The book: " + bookName + " is not available.\nWould you like to stand in queue?");
-        Scanner scan = new Scanner(System.in);
-        String answer = scan.nextLine();
-        if (answer.trim().equalsIgnoreCase("yes")){
-            if (queuetsdf.contains(userName)) {
-                System.out.println("You are already in the queue for this book.");
-            } else {
-                queuetsdf.add(userName);
-                System.out.println("You have been added to the queue for the book: " + bookName);
-            }
-        }
     }
 
     public boolean isAvailable() {

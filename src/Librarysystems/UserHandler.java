@@ -2,6 +2,8 @@ package Librarysystems;
 
 import Commands.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
@@ -14,13 +16,16 @@ public class UserHandler {
     private final List<Admin> adminList;
     private String loggedInUser;
     private Map<String, List<String>> notifications = new HashMap<>();
+    private Map<String, List<Book>> favourites;
+
 
     private UserHandler() {
         super();
         this.memberList = Member.getMembers();
         this.adminList = Admin.getAdmins();
         List<Book> bookList = Book.getBooks();
-        loadAllFavorites(this.memberList, "favorites.txt", bookList);
+        this.favourites = new HashMap<>();
+        loadFavouritesFromMapFile(Book.getBooks());
     }
 
     ////Singleton design mönster
@@ -47,6 +52,7 @@ public class UserHandler {
                 pincode = scan.nextInt();
                 if (person.getPassword() == pincode) {
                     System.out.println("Hello " + person.getName());
+                    setLoggedInUser(person.getUserName());
                     displayNotifications(person.getUserName());
                     return true;
                 } else if (!person.getUserName().equalsIgnoreCase(username)) {
@@ -63,7 +69,6 @@ public class UserHandler {
     }
 
     public String createUserAccount() {
-
         System.out.println("Enter your name: ");
         String name = scan.nextLine();
 
@@ -96,6 +101,7 @@ public class UserHandler {
 
     public String createAdminAccount() {
         System.out.println("Enter your name: ");
+        scan.nextLine();
         String name = scan.nextLine();
 
         System.out.println("Year of birth: ");
@@ -122,7 +128,7 @@ public class UserHandler {
 
         adminList.add(new Admin(name, yearOfBirth, userName, pincode));
 
-        System.out.println("Librarysystems.Admin " + name + " Salutations!");
+        System.out.println("Admin " + name + " Salutations!");
         return userName;
     }
 
@@ -154,13 +160,98 @@ public class UserHandler {
         }
     }
 
-    public void loadAllFavorites(List<Member> memberList, String filePath, List<Book> bookList) {
-        for (Member member : memberList) {
-            member.loadFavoritesFromFile(filePath, bookList);
+    public void addBookToFavourite(String userName, String ISBN) {
+        List<Book> bookList = Book.getBooks(); //get books from file
+        boolean bookFound = false;
+
+        System.out.println("Searching for ISBN: " + ISBN);
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("favourites.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2 && parts[0].equals(getLoggedInUser()) && parts[1].trim().equals(ISBN.trim())) {
+                    System.out.println("This book is already in your favourites.");
+                    return;
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading favourites file: " + e.getMessage());
+        }
+
+        for (Book book : bookList) {
+            if (book.getISBN().trim().equals(ISBN.trim())) {
+                favourites.computeIfAbsent(userName, k -> new ArrayList<>()).add(book);
+                saveFavouriteToFile();
+                loadFavouritesFromMapFile(Book.getBooks());
+                try (FileWriter writer = new FileWriter("favourites.txt", true)) {
+                    writer.write( userName + "," + ISBN + "\n");
+                } catch (IOException e) {
+                    System.out.println("Error saving favorite: " + e.getMessage());
+                }
+                System.out.println("Book added to favourites: " + book.getTitle());
+                bookFound = true;
+                break;
+            }
+        }
+        if (!bookFound) {
+            System.out.println("No book found with ISBN: " + ISBN);
+        }
+
+    }
+    public void getFavourites(String userName) {
+        List <Book> userFavourites = this.favourites.getOrDefault(userName, new ArrayList<>());
+        if (userFavourites != null && !userFavourites.isEmpty()) {
+            System.out.println("Your favorite books are: ");
+            for (Book book : userFavourites) {
+                System.out.println(book.getTitle());
+            }
+        } else {
+            System.out.println("You have no favorite books yet.");
         }
     }
 
-    public void deleteUser(String userName, List<Member> memberListIn) {
+    public void saveFavouriteToFile(){
+        try (FileWriter write = new FileWriter("favourites.txt", false)){
+            for (Map.Entry<String , List <Book>> entry : favourites.entrySet()) {
+                String userName = entry.getKey();
+                for(Book book : entry.getValue()){
+                    write.write(userName + "," + book.getISBN() + "\n");
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving favourites to file: " + e.getMessage());
+        }
+    }
+
+
+    public void loadFavouritesFromMapFile(List <Book> bookList) {
+        Map <String, Book> bookMap= new HashMap<>();
+        for (Book book : bookList) {
+            bookMap.put(book.getISBN(), book);
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("favourites.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String userName = parts[0].trim();
+                    String isbn = parts[1].trim();
+                    Book book = bookMap.get(isbn);
+                    if (book != null) {
+                        favourites.computeIfAbsent(userName, k -> new ArrayList<>()).add(book);
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public void deleteMember(String userName, List<Member> memberListIn) {
         Iterator<Member> iterator = memberListIn.iterator(); // Create an iterator for the list
         while (iterator.hasNext()) {
             Member member = iterator.next(); // Get the next member
@@ -189,7 +280,7 @@ public class UserHandler {
     }
 
     public void setLoggedInUser(String loggedInUser) {
-        this.loggedInUser= getLoggedInUser();
+        this.loggedInUser = loggedInUser;
         displayNotifications(loggedInUser);
     }
 

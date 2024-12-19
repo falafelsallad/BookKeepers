@@ -5,7 +5,7 @@ import Librarysystems.UserHandler;
 public class ViewNotifcationCommand implements Command {
     private UserHandler userHandler;
 
-    public ViewNotifcationCommand(UserHandler userHandler) {
+    public ViewNotifcationCommand() {
         this.userHandler = UserHandler.getInstance();
     }
 

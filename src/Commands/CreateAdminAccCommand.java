@@ -10,7 +10,7 @@ public class CreateAdminAccCommand implements Command {
     private static String LOGGEDIN_USERNAME;
     private static boolean loggedIn;
 
-    public CreateAdminAccCommand(UserHandler userHandler, Scanner scanner) {
+    public CreateAdminAccCommand(Scanner scanner) {
         this.userHandler = UserHandler.getInstance();
         this.scanner = scanner;
     }
@@ -18,7 +18,7 @@ public class CreateAdminAccCommand implements Command {
     @Override
     public void execute() {
         LOGGEDIN_USERNAME = userHandler.createAdminAccount();
-        System.out.println("Librarysystems.Admin account created successfully!");
+        System.out.println("Admin account created successfully!");
         loggedIn = true;
     }
 

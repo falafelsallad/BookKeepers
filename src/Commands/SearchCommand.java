@@ -9,9 +9,8 @@ public class SearchCommand implements Command {
     private UserHandler userHandler;
     private Scanner scanner;
     private List<Book> bookList = Book.getBooks();
-    private String LOGGEDIN_USERNAME;
 
-    public SearchCommand(UserHandler userHandler, Scanner scanner) {
+    public SearchCommand(Scanner scanner) {
         this.userHandler = UserHandler.getInstance();
         this.scanner = scanner;
     }

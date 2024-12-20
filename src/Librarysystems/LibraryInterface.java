@@ -1,199 +1,146 @@
 package Librarysystems;
+import Commands.*;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class LibraryInterface {
 
     private static LibraryInterface instance;
     private UserHandler userHandler;
+    private Map<Integer, Command> loginCommands;
+    private Map<Integer, Command> userCommands;
+    private Map<Integer, Command> adminCommands;
+    private final String menuOptionsLogin = "\n1. Login\n2. Sign up!!\n3. Admin Login\n4. Information";
 
-    private LibraryInterface(UserHandler userHandler) {
+    private final String userMenuOptions = "\n1. Search/Check quantity \n2. Borrow a book \n3. Return a book " +
+            "\n4. Book Tips \n5. Mark a favorite book\n6. View Favourites\n7. Check Loans\n8. View Notifications\n9. Exit";
+
+    private final String adminMenuOptions = "\n1.Check Loans\n2.Check Members\n3.Delete Member\n4.Create new Admin Account\n5.Exit";
+
+    private LibraryInterface(UserHandler userHandler){
         this.userHandler = UserHandler.getInstance();
+        initializeCommands();
+        runInterface();
 
+    }
+    private void initializeCommands() {
+    Scanner scanner = new Scanner(System.in);
+
+    loginCommands = new HashMap<>();
+    loginCommands.put(1, new UserLoginCommand(scanner));
+    loginCommands.put(2, new CreateUserAccCommand(scanner));
+    loginCommands.put(3, new AdminLoginCommand(scanner));
+    loginCommands.put(4, new LibraryInfoCommand());
+
+    userCommands= new HashMap<>();
+    userCommands.put(1, new SearchCommand(scanner));
+    userCommands.put(2, new BorrowCommand(scanner));
+    userCommands.put(3, new ReturnBookCommand(scanner));
+    userCommands.put(4, new BookTipsCommand(scanner));
+    userCommands.put(5, new FavoritesCommand(scanner));
+    userCommands.put(6, new ViewFavouritesCommand());
+    userCommands.put(7, new CheckYourLoansCommand(scanner));
+    userCommands.put(8, new ViewNotifcationCommand());
+    userCommands.put(9, new ExitCommand());
+
+
+
+    adminCommands = new HashMap<>();
+    adminCommands.put(1, new CheckLoanLog(scanner));
+    adminCommands.put(2, new CheckMembersCommand(scanner));
+    adminCommands.put(3, new DeleteMemberCommand(scanner));
+    adminCommands.put(4, new CreateAdminAccCommand(scanner));
+    adminCommands.put(5, new ExitCommand());
+
+    }
+
+    private void runInterface(){
+        Scanner scanner = new Scanner(System.in);
         boolean loggedIn = false;
         boolean adminLoggedIn = false;
 
-        String libraryName = "Bookworm Library";
-        String libraryLocation = "Tomtebodavägen 3A, 171 65 Solna";
-        String libraryTelephoneNumber = "08-466 60 00";
-        String LibraryOpenHours = "Mon-Fri 08-17";
-        String userNameLOGGEDIN = "Guest";
-        String menuOptionsLogin = "\n1. Login\n2. Sign up\n3. Admin Login\n4. Create Admin Account\n5. Information";
-
-        String menuOptions = "\n1. Search/Check quantity \n2. Borrow a book \n3. Return a book " +
-                "\n4. Book Tips \n5. Mark a favorite book\n6 Queue for a book \n7. Exit";
-        List<Book> bookList = Book.getBooks();
-        List<Loan> loanList = Loan.getLoanList();
-//        Loan.readLoanFromFile(loanList);
-        List<Member> memberList = Member.getMembers();
-
-        Scanner scanner = new Scanner(System.in);
-
         while (!loggedIn && !adminLoggedIn) {
             System.out.println(menuOptionsLogin);
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Clear buffer
+            int choice = getValidChoice(scanner, 1, 4);
 
-            switch (choice) {
-                case 1:
-                    System.out.println("Enter your username: ");
-                    userNameLOGGEDIN = scanner.nextLine().trim();
-                    loggedIn = userHandler.login(userNameLOGGEDIN.trim(), false, 0);
-                    break;
-                case 2:  // Create User account
-                    userNameLOGGEDIN = userHandler.createUserAccount();
-                    System.out.println("Account created successfully! You are now logged in.");
-                    loggedIn = true;
-                    break;
-                case 3:  // Login Admin
-                    System.out.println("Enter your username Librarysystems.Admin: ");
-                    userNameLOGGEDIN = scanner.nextLine().trim();
-                    adminLoggedIn = userHandler.login(userNameLOGGEDIN, true, 0);
-                    break;
-                case 4:  // Create Admin Account
-                    userNameLOGGEDIN = userHandler.createAdminAccount();
-                    System.out.println("Librarysystems.Admin account created successfully! You are now logged in.");
-                    adminLoggedIn = true;
-                case 5: // Library Info
-                     System.out.println(libraryName + " " + libraryLocation + " " + libraryTelephoneNumber + " " + LibraryOpenHours);
-                     break;
+            Command command = loginCommands.get(choice);
+            if (command != null) {
+                command.execute();
 
-                default:
-                    System.out.println("Invalid option. Please try again.");
+                if (command instanceof UserLoginCommand) {
+                    loggedIn = UserLoginCommand.getLoggedIn();
+                }
+                if (command instanceof AdminLoginCommand) {
+                    adminLoggedIn = AdminLoginCommand.getLoggedIn();
+                }
+                if (command instanceof CreateUserAccCommand) {
+                    loggedIn = CreateUserAccCommand.getLoggedIn();
+                }
+                if (command instanceof CreateAdminAccCommand) {
+                    adminLoggedIn = CreateAdminAccCommand.getLoggedIn();
+                }
+
+            } else {
+                System.out.println("Invalid choice");
             }
         }
 
-        System.out.println("Welcome to " + libraryName + "!");
+        if (loggedIn) {
+            while (loggedIn) {
+                System.out.println(userMenuOptions);
+                int choice = getValidChoice(scanner, 1, 9);
 
-        while (loggedIn) {
-            System.out.println(menuOptions);
-            System.out.println("Enter your choice: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Clear buffer
-
-            switch (choice) {
-                case 1:
-                    System.out.println("Enter search term: ");
-                    String searchInput = scanner.nextLine().trim();
-                    if (!searchInput.isEmpty()) {
-                        Book.searchBooks(searchInput, bookList, userNameLOGGEDIN);
-                    } else {
-                        System.out.println("Invalid input. Please enter a valid search term.");
+                Command command = userCommands.get(choice);
+                if (command != null) {
+                    command.execute();
+                    if (choice == 9) {
+                        loggedIn = false;
                     }
-                    break;
+                } else {
+                    System.out.println("Invalid choice");
+                }
 
-                case 2:
-//                    System.out.println("Choose your book by entering a search term:");
-//                    searchInput = scanner.nextLine().trim();
-//                    if (searchInput.isEmpty()) {
-//                        System.out.println("You must choose a valid book.");
-//                    } else {
-//                        Loan loan = new Loan(searchInput, userNameLOGGEDIN);
-//                        String result = loan.loanCreator(userNameLOGGEDIN, searchInput, bookList);
-//                        if (result.startsWith("Loan created successfully!")) {
-//                            loanList.add(loan);
-//                            Loan.saveLoansToFile(loanList);
-//                        }
-//                        System.out.println(result);
-//                    }
-                    break;
-
-                case 3:
-                    System.out.println("Enter the Loan ID to return the book:");
-                    String loanID = scanner.nextLine().trim();
-                    if (loanID.isEmpty()) {
-                        System.out.println("You must enter a valid Loan ID.");
-                    } else {
-                        String result = Loan.returnBook(loanID);
-                        Loan.saveLoansToFile(loanList);
-                        System.out.println(result);
-                    }
-                    break;
-
-                case 4:
-                    System.out.println(Book.printInfo(bookList.get(userHandler.getRandomBook())));
-                    break;
-                case 5:
-                    System.out.println("Enter the ISBN of the book you want to make your favorite:");
-                    String favoriteISBN = scanner.nextLine().trim();
-                    if (favoriteISBN.isEmpty()) {
-                        System.out.println("You must enter a valid ISBN.");
-                    } else {
-                        for (Member member : memberList) {
-                            if (member.getUserName().trim().equals(userNameLOGGEDIN.trim())) {
-//                                member.addBookToFavourite(favoriteISBN, "favourites.txt");//Puts books as favorites
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                case 6:
-                    System.out.println("Enter the ISBN of the book you want to queue for:");
-                    String queueISBN = scanner.nextLine().trim();
-
-                    if (queueISBN.isEmpty()) {
-                        System.out.println("You must enter a valid ISBN.");
-                    } else {
-                        boolean bookFound = false;
-                        for (Book book : bookList) {
-                            if (book.getISBN().trim().equals(queueISBN.trim())) {
-                                if (!book.isAvailable()) {
-                                    book.BookQueue(userNameLOGGEDIN);
-                                } else {
-                                    System.out.println("The book is available and does not require a queue.");
-                                }
-                                bookFound = true;
-                                break;
-                            }
-                        }
-                        if (!bookFound) {
-                            System.out.println("No book found with ISBN: " + queueISBN);
-                        }
-                    }
-                    break;
-
-                case 7:
-                    System.out.println("Thanks for your visit. Please come again.");
-                    loggedIn = false;
-                    break;
-                default:
-                    System.out.println("Invalid input. Please select a valid option.");
             }
         }
 
-        while (adminLoggedIn) {
+        if(adminLoggedIn) {
+            while (adminLoggedIn){
+                System.out.println(adminMenuOptions);
+                int choice = getValidChoice(scanner, 1, 5);
 
-            System.out.println("1.Check Loans\n2.Check Members\n3.Delete Librarysystems.Member\n4.Create new Librarysystems.Admin Account\n5.Exit");
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Clear buffer
-            switch (choice) {
-                case 1:
-                    System.out.println("Librarysystems.Loan List:\n" + loanList.toString());
-                    //Check Loans
-                    break;
-                case 2:
-                    //Check members
-                    System.out.println("Members List:\n" + memberList);
-                    break;
-                case 3:
-                    //Delete Librarysystems.Member
-                    System.out.println("Whats the username: ");
-                    String temp = scanner.nextLine();
-                    userHandler.deleteMember(temp, memberList);
-                    userHandler.updateUserFile(memberList);
-                    break;
-                case 4:
-                    userHandler.createAdminAccount();
-                    break;
-                case 5:
-                    //Exit
-                    adminLoggedIn = false;
-                    break;
+                Command command = adminCommands.get(choice);
+                if (command != null) {
+                    command.execute();
+                    if (choice == 5){
+                        adminLoggedIn = false;
+                    }
+                } else {
+                    System.out.println("Invalid choice");
+                }
             }
         }
-        System.out.println("Program terminated.");
     }
+
+    private int getValidChoice(Scanner scanner, int min, int max) {
+        int choice;
+        while (true){
+            System.out.println("Enter your choice: ");
+
+            if (scanner.hasNextInt()){
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Clear buffer
+                if (choice >= min && choice <= max) break;
+                else System.out.println("Invalid choice. Enter a number between " + min + " and " + max);
+            } else {
+                System.out.println("Invalid input. Please enter a number.");
+                scanner.next();
+            }
+        }
+        return choice;
+    }
+
 
     public static synchronized LibraryInterface getInstance(UserHandler userHandler) {
         if (instance == null) {

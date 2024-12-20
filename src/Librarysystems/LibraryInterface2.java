@@ -8,16 +8,16 @@ import java.util.Scanner;
 public class LibraryInterface2 {
 
     private static LibraryInterface2 instance;
-    private final UserHandler userHandler;
+    private UserHandler userHandler;
     private Map<Integer, Command> loginCommands;
     private Map<Integer, Command> userCommands;
     private Map<Integer, Command> adminCommands;
-    private String menuOptionsLogin = "\n1. Login\n2. Sign up!!\n3. Admin Login\n4. Information";
+    private final String menuOptionsLogin = "\n1. Login\n2. Sign up!!\n3. Admin Login\n4. Information";
 
-    private String userMenuOptions = "\n1. Search/Check quantity \n2. Borrow a book \n3. Return a book " +
+    private final String userMenuOptions = "\n1. Search/Check quantity \n2. Borrow a book \n3. Return a book " +
             "\n4. Book Tips \n5. Mark a favorite book\n6. View Favourites\n7. Check Loans\n8. View Notifications\n9. Exit";
 
-    private String adminMenuOptions = "\n1.Check Loans\n2.Check Members\n3.Delete Member\n4.Create new Admin Account\n5.Exit";
+    private final String adminMenuOptions = "\n1.Check Loans\n2.Check Members\n3.Delete Member\n4.Create new Admin Account\n5.Exit";
 
     private LibraryInterface2(UserHandler userHandler){
         this.userHandler = UserHandler.getInstance();

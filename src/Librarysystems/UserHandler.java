@@ -94,8 +94,11 @@ public class UserHandler {
             System.out.println("Could not create the file");
         }
 
-        memberList.add(new Member(name, yearOfBirth, userName, pincode));
-        System.out.println("`\nGreetings " + name);
+        Member member = (Member) PersonFactory.createPerson(
+                "Member", name , yearOfBirth, userName, pincode);
+
+        memberList.add(member);
+        System.out.println("\nGreetings " + name);
         return userName;
     }
 
@@ -119,6 +122,7 @@ public class UserHandler {
 
         System.out.println("Create a pincode 4 digits:");
         int pincode = scan.nextInt();
+        scan.nextLine();
 
         try (FileWriter fileWriter = new FileWriter("FileNameAdmin.txt", true)) {
             fileWriter.write(name + "," + yearOfBirth + "," + userName + "," + pincode + "\n");
@@ -126,7 +130,10 @@ public class UserHandler {
             System.out.println("Could not create the file");
         }
 
-        adminList.add(new Admin(name, yearOfBirth, userName, pincode));
+        Admin admin = (Admin) PersonFactory.createPerson(
+                "Admin", name, yearOfBirth, userName, pincode);
+
+        adminList.add(admin);
 
         System.out.println("Admin " + name + " Salutations!");
         return userName;
